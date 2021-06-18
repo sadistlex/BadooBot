@@ -42,7 +42,7 @@ public  class WebDriverSettings {
         //WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.setPageLoadStrategy(PageLoadStrategy.EAGER);
-        options.setHeadless(true);
+        //options.setHeadless(true);
 
         if (getMainUrl().contains("nginx")){
             options.setHeadless(true);
@@ -185,6 +185,10 @@ public  class WebDriverSettings {
 
 
     public static String mainUrlRelease = "https://badoo.com/ru/signin/";
+
+    public static String signinLink = "/ru/signin/";
+    public static String encountersLink = "/encounters";
+    public static String matchedLink = "/matched";
 /*
     public static String login = "justletmeinalready@yandex.ru";
     public static String pass = "1badoo2";
@@ -197,6 +201,9 @@ public  class WebDriverSettings {
     public static int minWaitTime = Integer.parseInt(PropertyManager.getProperty("minWait"));
     public static int maxWaitTime = Integer.parseInt(PropertyManager.getProperty("maxWait"));
     public static int likeAmount = Integer.parseInt(PropertyManager.getProperty("likeAmount"));
+    public static String msg1 = PropertyManager.getProperty("msg1");
+    public static String msg2 = PropertyManager.getProperty("msg2");
+    public static String msg3 = PropertyManager.getProperty("msg3");
 
 
 }

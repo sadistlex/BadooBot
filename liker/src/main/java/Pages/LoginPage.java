@@ -46,7 +46,14 @@ public class LoginPage extends DriverGetter {
             System.out.println("Waiting for login to appear");
             wait.until(ExpectedConditions.textToBePresentInElementValue(inputEmail, WebDriverSettings.login));
             inputPassword.sendKeys(Keys.ENTER);
-            wait.until(ExpectedConditions.urlContains("encounters"));
+            try {
+                wait.until(ExpectedConditions.urlContains("encounters"));
+            }
+            catch (TimeoutException exception){
+                pageInner.open("/encounters");
+                wait.until(ExpectedConditions.urlContains("encounters"));
+                pageInner.waitForPageLoad();
+            }
             PropertyManager.setProperty("cookie", getSessionCookie());
         }
     }

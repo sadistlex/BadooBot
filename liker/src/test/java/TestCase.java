@@ -1,7 +1,4 @@
-import Pages.EncountersPage;
-import Pages.LoginPage;
-import Pages.MainPage;
-import Pages.Page;
+import Pages.*;
 import Settings.TestControl;
 import Settings.WebDriverSettings;
 import org.junit.jupiter.api.*;
@@ -16,6 +13,7 @@ class TestCase extends WebDriverSettings {
     static Page page;
     static LoginPage loginPage;
     static EncountersPage encountersPage;
+    static MessengerPage messengerPage;
 
 
     @Nested
@@ -30,6 +28,7 @@ class TestCase extends WebDriverSettings {
             mainPage = new MainPage(driver);
             loginPage = new LoginPage(driver);
             encountersPage = new EncountersPage(driver);
+            messengerPage = new MessengerPage(driver);
             page = PageFactory.initElements(driver, Page.class);
         }
 
