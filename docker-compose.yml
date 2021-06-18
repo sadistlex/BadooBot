@@ -1,6 +1,5 @@
 version: '3'
 services:
-  #PHP Service
 
   liker:
     image: markhobson/maven-chrome:jdk-11
