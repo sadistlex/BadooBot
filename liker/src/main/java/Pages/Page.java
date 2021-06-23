@@ -25,25 +25,12 @@ public class Page extends DriverGetter {
     }
 
     public int switchToMobileWidth = 1024;
-    //Кнопка закрыть дебагбар
-    private String debugBarLocator = "a[class='phpdebugbar-close-btn']";
-    @FindBy(css = "a[class='phpdebugbar-close-btn']")
-    public WebElement debugbarCloseBtn;
 
-    @FindBy(css = "input[name='USER_LOGIN']")
-    public WebElement inputLogin;
+    //Кнопка продолжить при двойном логине
+    @FindBy (css = "div[class='btn js-continue']")
+    public WebElement continueBtn;
 
-    @FindBy(css = "input[name='USER_PASSWORD']")
-    public WebElement inputPassword;
 
-    @FindBy(css = "input[class='login-btn']")
-    public WebElement loginBtn;
-
-    public void login(){
-        inputLogin.sendKeys(WebDriverSettings.login);
-        inputPassword.sendKeys(WebDriverSettings.pass);
-        click(loginBtn);
-    }
 
     public void waitMs(int ms){
         try{
@@ -180,14 +167,7 @@ public class Page extends DriverGetter {
         driver.navigate().to(WebDriverSettings.getMainUrl() + urlAppend);
     }
 
-    public void closeDebugBar(){
-        boolean exists = checkIfElementExists(debugbarCloseBtn);
-        if (exists){
-            if (debugbarCloseBtn.isDisplayed()) {
-                click(debugbarCloseBtn);
-            }
-        }
-    }
+
 
     public void scrollToTop(){
         System.out.println("Scrolling to top of the page");
@@ -202,7 +182,6 @@ public class Page extends DriverGetter {
         }
         catch (ElementClickInterceptedException e){
             System.out.println("ElementClickInterceptedException caught");
-            closeDebugBar();
             scrollToTop();
             System.out.println("Trying to click again");
             element.click();
@@ -214,6 +193,7 @@ public class Page extends DriverGetter {
         }
         catch (ElementNotInteractableException e){
             System.out.println("Caught NotInteractable Exception, waiting for element to be clickable");
+            continueMultiple();
             wait.until(ExpectedConditions.elementToBeClickable(element));
             element.click();
         }
@@ -291,7 +271,6 @@ public class Page extends DriverGetter {
     public void waitForPageLoad(){
         System.out.println("Waiting for page to finish loading");
         int max = 300000;
-        System.out.println((((JavascriptExecutor) driver).executeScript("return document.readyState")));
         while (true){
             boolean loaded = (((JavascriptExecutor) driver)
                     .executeScript("return document.readyState")).equals("complete");
@@ -308,8 +287,16 @@ public class Page extends DriverGetter {
                 break;
             }
         }
-        System.out.println((((JavascriptExecutor) driver).executeScript("return document.readyState")));
+    }
 
+    public void continueMultiple(){
+        boolean exists = pageInner.checkIfElementExists(continueBtn);
+        if (exists){
+            if (continueBtn.isDisplayed()) {
+                System.out.println("Found multiple login popup, continuing");
+                pageInner.click(continueBtn);
+            }
+        }
     }
 
     public void waitForElementVisible(WebElement element){

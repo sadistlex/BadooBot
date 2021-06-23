@@ -38,6 +38,7 @@ public class EncountersPage extends DriverGetter {
 
 
 
+
     public void waitRandomTime(){
         Random rand = new Random();
         int randomNum = rand.nextInt((maxWaitTime - minWaitTime) + 1) + minWaitTime;
@@ -50,6 +51,7 @@ public class EncountersPage extends DriverGetter {
             waitRandomTime();
             skipAnnouncements();
             matchReactWithMsg();
+            pageInner.continueMultiple();
             System.out.println("Pressing 1 for the " + (i+1) + "'th time, " + (amount-i) + " remaining");
             new Actions(driver).sendKeys("1").perform();
         }
@@ -78,5 +80,7 @@ public class EncountersPage extends DriverGetter {
         }
 
     }
+
+
 
 }

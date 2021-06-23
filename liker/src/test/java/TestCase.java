@@ -30,15 +30,23 @@ class TestCase extends WebDriverSettings {
             encountersPage = new EncountersPage(driver);
             messengerPage = new MessengerPage(driver);
             page = PageFactory.initElements(driver, Page.class);
+
         }
 
         @Test
         @Order(1)
         public void likes() {
-            page.open();
-            loginPage.login();
-            page.waitForPageLoad();
+            loginPage.loginSequence();
             encountersPage.pressLike(likeAmount);
         }
+
+        @Test
+        @Order(2)
+        public void messages(){
+            loginPage.loginSequence();
+            page.open(messagesLink);
+            messengerPage.messagingSequence();
+        }
+
     }
 }
