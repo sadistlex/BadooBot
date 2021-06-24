@@ -30,7 +30,13 @@ public class Page extends DriverGetter {
     @FindBy (css = "div[class='btn js-continue']")
     public WebElement continueBtn;
 
+    //Пропустить окно "отправлять уведомление"
+    @FindBy (css = "div[class='btn btn--monochrome js-chrome-pushes-deny']")
+    public WebElement skipBtn;
 
+    //Закрыть окно туториала
+    @FindBy (css = "div[class*='dropdown__close js-im-skip-filters-tooltip']")
+    public WebElement skipTutorialBtn;
 
     public void waitMs(int ms){
         try{
@@ -175,6 +181,16 @@ public class Page extends DriverGetter {
                 .executeScript("window.scrollTo(0, 0);");
     }
 
+    public void closeTutorialPopup(){
+        boolean exists = pageInner.checkIfElementExists(skipTutorialBtn);
+        if (exists){
+            if (skipTutorialBtn.isDisplayed()) {
+                System.out.println("Found tutorial popup, closing");
+                pageInner.click(skipTutorialBtn);
+            }
+        }
+    }
+
     public void click(WebElement element){
         try{
             System.out.println("Clicking on element " + element);
@@ -182,7 +198,7 @@ public class Page extends DriverGetter {
         }
         catch (ElementClickInterceptedException e){
             System.out.println("ElementClickInterceptedException caught");
-            scrollToTop();
+            closeTutorialPopup();
             System.out.println("Trying to click again");
             element.click();
         }
@@ -193,7 +209,7 @@ public class Page extends DriverGetter {
         }
         catch (ElementNotInteractableException e){
             System.out.println("Caught NotInteractable Exception, waiting for element to be clickable");
-            continueMultiple();
+            continueIfMultipleSessions();
             wait.until(ExpectedConditions.elementToBeClickable(element));
             element.click();
         }
@@ -289,12 +305,23 @@ public class Page extends DriverGetter {
         }
     }
 
-    public void continueMultiple(){
+    public void continueIfMultipleSessions(){
         boolean exists = pageInner.checkIfElementExists(continueBtn);
         if (exists){
             if (continueBtn.isDisplayed()) {
                 System.out.println("Found multiple login popup, continuing");
                 pageInner.click(continueBtn);
+            }
+        }
+    }
+
+    public void skipAnnouncements(){
+        boolean exists = pageInner.checkIfElementExists(skipBtn);
+        if (exists){
+            if (skipBtn.isDisplayed()) {
+                System.out.println("Found popup, closing");
+                pageInner.click(skipBtn);
+                pageInner.waitMs(1000);
             }
         }
     }

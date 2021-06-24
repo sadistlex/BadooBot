@@ -18,7 +18,6 @@ class TestCase extends WebDriverSettings {
 
     @Nested
     @Tag("Main")
-    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     //@Disabled
     public class MainCases {
 
@@ -34,19 +33,14 @@ class TestCase extends WebDriverSettings {
         }
 
         @Test
-        @Order(1)
-        public void likes() {
+        public void fullSequence(){
             loginPage.loginSequence();
-            encountersPage.pressLike(likeAmount);
+            for (int i=1;i<=repeats;i++){
+                System.out.println("Starting sequence #" + i);
+                encountersPage.pressLikeSequence(likeAmount);
+                messengerPage.messagingSequence();
+            }
+            System.out.println("All sequences are done");
         }
-
-        @Test
-        @Order(2)
-        public void messages(){
-            loginPage.loginSequence();
-            page.open(messagesLink);
-            messengerPage.messagingSequence();
-        }
-
     }
 }

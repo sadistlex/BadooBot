@@ -38,7 +38,7 @@ public  class WebDriverSettings {
         //WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.setPageLoadStrategy(PageLoadStrategy.EAGER);
-        //options.setHeadless(true);
+        options.setHeadless(true);
 
         LoggingPreferences logPrefs = new LoggingPreferences();
         logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
@@ -73,26 +73,6 @@ public  class WebDriverSettings {
             System.out.println(e.getMessage());
         }
     }
-
-    private static String fileChecker(String path) throws FileNotFoundException {
-        System.out.println("Checking local file " + path);
-        FileReader env = new FileReader(path);
-        StringBuilder sb = new StringBuilder();
-        try {
-            BufferedReader reader = new BufferedReader(env);
-            while (reader.ready()){
-                sb.append(reader.readLine());
-            }
-            reader.close();
-        }
-        catch (IOException e){
-            System.out.println(e.getMessage());
-        }
-        String host = sb.toString();
-        System.out.println(host);
-        return host;
-    }
-
 
     public static String getMainUrl (){
         return mainUrlRelease;
@@ -133,9 +113,10 @@ public  class WebDriverSettings {
     public static int minWaitTime = Integer.parseInt(PropertyManager.getProperty("minWait"));
     public static int maxWaitTime = Integer.parseInt(PropertyManager.getProperty("maxWait"));
     public static int likeAmount = Integer.parseInt(PropertyManager.getProperty("likeAmount"));
+    public static int repeats = Integer.parseInt(PropertyManager.getProperty("repeats"));
+
     public static String msg1 = PropertyManager.getProperty("msg1");
     public static String msg2 = PropertyManager.getProperty("msg2");
     public static String msg3 = PropertyManager.getProperty("msg3");
-
 
 }
