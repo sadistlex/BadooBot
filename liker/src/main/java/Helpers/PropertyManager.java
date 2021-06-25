@@ -1,20 +1,20 @@
 package Helpers;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
 public class PropertyManager {
 
     public static String getProperty(String key) {
-        FileInputStream fis;
+        FileReader fileReader;
         Properties property = new Properties();
         String result = "";
         try {
-            fis = new FileInputStream("config.properties");
-            property.load(fis);
-            fis.close();
+            fileReader = new FileReader("config.properties");
+            property.load(fileReader);
+            fileReader.close();
         } catch (IOException e) {
             System.err.println("ОШИБКА: Файл свойств отсуствует!");
         }
@@ -23,15 +23,14 @@ public class PropertyManager {
     }
 
     public static void setProperty(String key, String value){
-        FileInputStream fis;
+        FileReader fileReader;
         Properties property = new Properties();
-        String result = "";
         try {
-            fis = new FileInputStream("config.properties");
-            property.load(fis);
-            fis.close();
+            fileReader = new FileReader("config.properties");
+            property.load(fileReader);
+            fileReader.close();
             property.setProperty(key, value);
-            property.store(new FileOutputStream("config.properties"), null);
+            property.store(new FileWriter("config.properties"), null);
         } catch (IOException e) {
             System.err.println("ОШИБКА: Файл свойств отсуствует!");
         }

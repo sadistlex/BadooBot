@@ -25,25 +25,18 @@ public class Page extends DriverGetter {
     }
 
     public int switchToMobileWidth = 1024;
-    //Кнопка закрыть дебагбар
-    private String debugBarLocator = "a[class='phpdebugbar-close-btn']";
-    @FindBy(css = "a[class='phpdebugbar-close-btn']")
-    public WebElement debugbarCloseBtn;
 
-    @FindBy(css = "input[name='USER_LOGIN']")
-    public WebElement inputLogin;
+    //Кнопка продолжить при двойном логине
+    @FindBy (css = "div[class='btn js-continue']")
+    public WebElement continueBtn;
 
-    @FindBy(css = "input[name='USER_PASSWORD']")
-    public WebElement inputPassword;
+    //Пропустить окно "отправлять уведомление"
+    @FindBy (css = "div[class='btn btn--monochrome js-chrome-pushes-deny']")
+    public WebElement skipBtn;
 
-    @FindBy(css = "input[class='login-btn']")
-    public WebElement loginBtn;
-
-    public void login(){
-        inputLogin.sendKeys(WebDriverSettings.login);
-        inputPassword.sendKeys(WebDriverSettings.pass);
-        click(loginBtn);
-    }
+    //Закрыть окно туториала
+    @FindBy (css = "div[class*='dropdown__close js-im-skip-filters-tooltip']")
+    public WebElement skipTutorialBtn;
 
     public void waitMs(int ms){
         try{
@@ -180,19 +173,22 @@ public class Page extends DriverGetter {
         driver.navigate().to(WebDriverSettings.getMainUrl() + urlAppend);
     }
 
-    public void closeDebugBar(){
-        boolean exists = checkIfElementExists(debugbarCloseBtn);
-        if (exists){
-            if (debugbarCloseBtn.isDisplayed()) {
-                click(debugbarCloseBtn);
-            }
-        }
-    }
+
 
     public void scrollToTop(){
         System.out.println("Scrolling to top of the page");
         ((JavascriptExecutor) driver)
                 .executeScript("window.scrollTo(0, 0);");
+    }
+
+    public void closeTutorialPopup(){
+        boolean exists = pageInner.checkIfElementExists(skipTutorialBtn);
+        if (exists){
+            if (skipTutorialBtn.isDisplayed()) {
+                System.out.println("Found tutorial popup, closing");
+                pageInner.click(skipTutorialBtn);
+            }
+        }
     }
 
     public void click(WebElement element){
@@ -202,8 +198,7 @@ public class Page extends DriverGetter {
         }
         catch (ElementClickInterceptedException e){
             System.out.println("ElementClickInterceptedException caught");
-            closeDebugBar();
-            scrollToTop();
+            closeTutorialPopup();
             System.out.println("Trying to click again");
             element.click();
         }
@@ -214,6 +209,7 @@ public class Page extends DriverGetter {
         }
         catch (ElementNotInteractableException e){
             System.out.println("Caught NotInteractable Exception, waiting for element to be clickable");
+            continueIfMultipleSessions();
             wait.until(ExpectedConditions.elementToBeClickable(element));
             element.click();
         }
@@ -291,7 +287,6 @@ public class Page extends DriverGetter {
     public void waitForPageLoad(){
         System.out.println("Waiting for page to finish loading");
         int max = 300000;
-        System.out.println((((JavascriptExecutor) driver).executeScript("return document.readyState")));
         while (true){
             boolean loaded = (((JavascriptExecutor) driver)
                     .executeScript("return document.readyState")).equals("complete");
@@ -308,8 +303,27 @@ public class Page extends DriverGetter {
                 break;
             }
         }
-        System.out.println((((JavascriptExecutor) driver).executeScript("return document.readyState")));
+    }
 
+    public void continueIfMultipleSessions(){
+        boolean exists = pageInner.checkIfElementExists(continueBtn);
+        if (exists){
+            if (continueBtn.isDisplayed()) {
+                System.out.println("Found multiple login popup, continuing");
+                pageInner.click(continueBtn);
+            }
+        }
+    }
+
+    public void skipAnnouncements(){
+        boolean exists = pageInner.checkIfElementExists(skipBtn);
+        if (exists){
+            if (skipBtn.isDisplayed()) {
+                System.out.println("Found popup, closing");
+                pageInner.click(skipBtn);
+                pageInner.waitMs(1000);
+            }
+        }
     }
 
     public void waitForElementVisible(WebElement element){

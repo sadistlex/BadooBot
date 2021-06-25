@@ -1,7 +1,4 @@
-import Pages.EncountersPage;
-import Pages.LoginPage;
-import Pages.MainPage;
-import Pages.Page;
+import Pages.*;
 import Settings.TestControl;
 import Settings.WebDriverSettings;
 import org.junit.jupiter.api.*;
@@ -16,11 +13,11 @@ class TestCase extends WebDriverSettings {
     static Page page;
     static LoginPage loginPage;
     static EncountersPage encountersPage;
+    static MessengerPage messengerPage;
 
 
     @Nested
     @Tag("Main")
-    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     //@Disabled
     public class MainCases {
 
@@ -30,16 +27,20 @@ class TestCase extends WebDriverSettings {
             mainPage = new MainPage(driver);
             loginPage = new LoginPage(driver);
             encountersPage = new EncountersPage(driver);
+            messengerPage = new MessengerPage(driver);
             page = PageFactory.initElements(driver, Page.class);
+
         }
 
         @Test
-        @Order(1)
-        public void likes() {
-            page.open();
-            loginPage.login();
-            page.waitForPageLoad();
-            encountersPage.pressLike(likeAmount);
+        public void fullSequence(){
+            loginPage.loginSequence();
+            for (int i=1;i<=repeats;i++){
+                System.out.println("Starting sequence #" + i);
+                encountersPage.pressLikeSequence(likeAmount);
+                messengerPage.messagingSequence();
+            }
+            System.out.println("All sequences are done");
         }
     }
 }
