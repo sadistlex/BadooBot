@@ -48,6 +48,9 @@ public class MessengerPage extends DriverGetter {
     @FindBy (css = "span[class='connection-header__name']")
     public WebElement currentContactName;
 
+    //Кнопка звездочка "Избранное" у контакта
+    public String favouriteContactBtnLoc = "div[class*='js-im-favorites-wrap']";
+
     //Блок сообщений
     @FindBy (css = "div[id='messages_body']")
     public WebElement messagesBlock;
@@ -58,6 +61,8 @@ public class MessengerPage extends DriverGetter {
     public String outgoingMessageLoc = "div[class*='message--out']";
     @FindBy (css = "div[class*='message--out']")
     public WebElement outgoingMessage;
+    //Входящие сообщения
+    public String incomingMessageLoc = "div[class*='message--in']";
 
     private List<WebElement> getContactsList(){
         System.out.println("Getting contacts list");
@@ -82,12 +87,17 @@ public class MessengerPage extends DriverGetter {
                 String name = e.findElement(By.cssSelector(contactNameLoc)).getText();
                 String avatarLink = extractIDFromImageLink(e.findElement(By.tagName(contactImageLoc)).getAttribute("src"));
                 System.out.println("Opening conversation with " + name + " ID " + avatarLink);
-                pageInner.click(e);
-                waitForContactLoad(e, name, avatarLink);
-                if (isAwaitingResponse()) {
-                    messageSendLogic();
-                } else {
-                    System.out.println("Skipping contact, our message is not the last one");
+                if (!checkIfFavourite(e.findElement(By.cssSelector(favouriteContactBtnLoc)))){
+                    pageInner.click(e);
+                    waitForContactLoad(e, name, avatarLink);
+                    if (isAwaitingResponse()) {
+                        messageSendLogic();
+                    } else {
+                        System.out.println("Skipping contact, our message is not the last one");
+                    }
+                }
+                else {
+                    System.out.println("Skipping contact because it's in favourites");
                 }
             }
         }
@@ -118,6 +128,10 @@ public class MessengerPage extends DriverGetter {
     private void performSkips(){
         pageInner.continueIfMultipleSessions();
         pageInner.skipAnnouncements();
+    }
+
+    private boolean checkIfFavourite(WebElement favouriteElement){
+        return favouriteElement.getAttribute("class").contains("is-active");
     }
 
     private void messageSendLogic(){
@@ -194,6 +208,20 @@ public class MessengerPage extends DriverGetter {
         return messageTexts;
     }
 
+    private List<String> getIncomingMessagesList(){
+        System.out.println("Getting incoming messages");
+        List<WebElement> inMessagesElementsList = driver.findElements(By.cssSelector(incomingMessageLoc));
+        System.out.println("Amount of incoming message elements " + inMessagesElementsList.size());
+        List<String> messageTexts = new ArrayList<>();
+        for (WebElement e : inMessagesElementsList){
+            String messageText = e.findElement(By.tagName("span")).getText();
+            System.out.println(messageText);
+            messageTexts.add(messageText);
+        }
+        System.out.println("Amount of outgoing message texts " + messageTexts.size());
+        return messageTexts;
+    }
+
     private String getLastMessageText(){
         System.out.println("Getting latest outgoing message");
         List<String> messagesList = getOutgoingMessagesList();
@@ -207,6 +235,13 @@ public class MessengerPage extends DriverGetter {
                 .trim();
     }
 
+    /*
+    private void checkIncomingMessagesForPhone(List<String> inMessageList){
+        for (String msg : inMessageList){
+
+        }
+    }
+*/
     private boolean checkIfHasForeignMsgs(List<String> messageList){
         System.out.println("Checking for foreign messages");
         List<String> presetMessagesList = List.of(msgWithoutSmileys(msg1), msgWithoutSmileys(msg2), msgWithoutSmileys(msg3));
