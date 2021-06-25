@@ -16,6 +16,8 @@ import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -61,10 +63,11 @@ public  class WebDriverSettings {
     @BeforeAll
     public static void consoleOutput(){
         try {
-            PrintStream out = new PrintStream(new FileOutputStream("target/logs/out.log",true));
+            String currentTime = getCurrentTime();
+            PrintStream out = new PrintStream(new FileOutputStream("target/logs/out-" + currentTime + ".log",true));
             PrintStream dual = new DualStream(System.out, out);
             System.setOut(dual);
-            PrintStream err = new PrintStream(new FileOutputStream("target/logs/out.log",true));
+            PrintStream err = new PrintStream(new FileOutputStream("target/logs/out-" + currentTime + ".log",true));
             dual = new DualStream(System.err, err);
             System.setErr(dual);
         }
@@ -87,6 +90,12 @@ public  class WebDriverSettings {
         }
         catch (IOException ignored){
         }
+    }
+
+    public static String getCurrentTime(){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+        LocalDateTime now = LocalDateTime.now();
+        return dtf.format(now);
     }
 
     private static int waitTime = 20;
