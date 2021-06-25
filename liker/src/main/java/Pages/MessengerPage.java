@@ -2,9 +2,7 @@ package Pages;
 
 import Helpers.DriverGetter;
 import Settings.WebDriverSettings;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -73,62 +71,92 @@ public class MessengerPage extends DriverGetter {
         pageInner.open(messagesLink);
         pageInner.waitForPageLoad();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(contactsUsersLoc)));
-        List<WebElement> contactsList = getContactsList();
-        for (WebElement e : contactsList){
-            pageInner.continueIfMultipleSessions();
-            pageInner.skipAnnouncements();
-            String name = e.findElement(By.cssSelector(contactNameLoc)).getText();
-            String avatarLink = e.findElement(By.tagName(contactImageLoc)).getAttribute("src");
-            System.out.println("Opening conversation with " + name);
-            pageInner.click(e);
-            waitForContactLoad(name, avatarLink);
-            if (isAwaitingResponse()) {
-                Stages currentStage = checkCurrentStage();
-                if (currentStage.equals(Stages.OTHER)){
-                    System.out.println("Skipping contact, foreign messages found");
-                }
-                else if (currentStage.equals(Stages.DONE)){
-                    System.out.println("Skipping contact, all steps are already finished");
-                }
-                else {
-                    String message;
-                    int msgAmount;
-                    switch (currentStage){
-                        case ONE:
-                            message = msg1;
-                            msgAmount = 0;
-                            break;
-                        case TWO:
-                            message = msg2;
-                            msgAmount = 1;
-                            break;
-                        case THREE:
-                            message = msg3;
-                            msgAmount = 2;
-                            break;
-                        default:
-                            message = "";
-                            msgAmount = 0;
-                    }
-                    System.out.println("Sending message: " + message);
-                    inputMessage.sendKeys(message);
-                    wait.until(ExpectedConditions.textToBePresentInElement(inputMessage, message));
-                    pageInner.click(sendMessageBtn);
-                    System.out.println("Message sent");
-                    wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector(outgoingMessageLoc), msgAmount));
-                    System.out.println("Message visible");
+        contactIteration();
+    }
+
+    private void contactIteration(){
+        try {
+            List<WebElement> contactsList = getContactsList();
+            for (WebElement e : contactsList) {
+                performSkips();
+                String name = e.findElement(By.cssSelector(contactNameLoc)).getText();
+                String avatarLink = extractIDFromImageLink(e.findElement(By.tagName(contactImageLoc)).getAttribute("src"));
+                System.out.println("Opening conversation with " + name + " ID " + avatarLink);
+                pageInner.click(e);
+                waitForContactLoad(e, name, avatarLink);
+                if (isAwaitingResponse()) {
+                    messageSendLogic();
+                } else {
+                    System.out.println("Skipping contact, our message is not the last one");
                 }
             }
-            else {
-                System.out.println("Skipping contact, our message is not the last one");
-            }
+        }
+        catch (StaleElementReferenceException e){
+            System.out.println("Stale element exception caught, reloading contacts");
+            contactIteration();
         }
     }
 
-    private void waitForContactLoad(String name, String imgLink){
-        System.out.println("Waiting for contact load");
-        wait.until(ExpectedConditions.textToBePresentInElement(currentContactName, name));
-        wait.until(ExpectedConditions.attributeContains(currentContactImage, "src", extractIDFromImageLink(imgLink)));
+    private void waitForContactLoad(WebElement contact, String name, String imgID){
+        try {
+            System.out.println("Waiting for contact load");
+            wait.until(ExpectedConditions.textToBePresentInElement(currentContactName, name));
+            System.out.println("Current contact name (" + name + ") matches, waiting for img ID");
+            wait.until(ExpectedConditions.attributeContains(currentContactImage, "src", imgID));
+            System.out.println("Current img ID (" + imgID + ") matches");
+        }
+        catch (TimeoutException e){
+            System.out.println("Timeout Exception intercepted, trying to click on contact again " + e.getMessage());
+            pageInner.click(contact);
+            wait.until(ExpectedConditions.textToBePresentInElement(currentContactName, name));
+            System.out.println("Current contact name (" + name + ") matches, waiting for img ID");
+            wait.until(ExpectedConditions.attributeContains(currentContactImage, "src", imgID));
+            System.out.println("Current img ID (" + imgID + ") matches");
+        }
+    }
+
+    private void performSkips(){
+        pageInner.continueIfMultipleSessions();
+        pageInner.skipAnnouncements();
+    }
+
+    private void messageSendLogic(){
+        Stages currentStage = checkCurrentStage();
+        if (currentStage.equals(Stages.OTHER)){
+            System.out.println("Skipping contact, foreign messages found");
+        }
+        else if (currentStage.equals(Stages.DONE)){
+            System.out.println("Skipping contact, all steps are already finished");
+        }
+        else {
+            String message;
+            int msgAmount;
+            switch (currentStage){
+                case ONE:
+                    message = msg1;
+                    msgAmount = 0;
+                    break;
+                case TWO:
+                    message = msg2;
+                    msgAmount = 1;
+                    break;
+                case THREE:
+                    message = msg3;
+                    msgAmount = 2;
+                    break;
+                default:
+                    message = "";
+                    msgAmount = 0;
+            }
+            System.out.println("Sending message: " + message);
+            inputMessage.sendKeys(message);
+            wait.until(ExpectedConditions.textToBePresentInElement(inputMessage, message));
+            pageInner.click(sendMessageBtn);
+            System.out.println("Message sent");
+            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector(outgoingMessageLoc), msgAmount));
+            System.out.println("Message visible");
+        }
+
     }
 
     private boolean isAwaitingResponse(){
@@ -182,8 +210,8 @@ public class MessengerPage extends DriverGetter {
     private boolean checkIfHasForeignMsgs(List<String> messageList){
         System.out.println("Checking for foreign messages");
         List<String> presetMessagesList = List.of(msgWithoutSmileys(msg1), msgWithoutSmileys(msg2), msgWithoutSmileys(msg3));
-        System.out.println("List of preset messages:");
-        presetMessagesList.forEach(System.out::println);
+//        System.out.println("List of preset messages:");
+//        presetMessagesList.forEach(System.out::println);
         boolean checkResult = false;
         if (messageList.size()>3){
             checkResult = true;

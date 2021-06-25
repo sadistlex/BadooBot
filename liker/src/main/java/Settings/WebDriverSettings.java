@@ -98,7 +98,7 @@ public  class WebDriverSettings {
         return dtf.format(now);
     }
 
-    private static int waitTime = 20;
+    private static int waitTime = 10;
 
     public static  int getWaitTime() {
         return waitTime;
