@@ -3,8 +3,6 @@ package Settings;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestWatcher;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 public class TestControl implements TestWatcher {
@@ -29,9 +27,7 @@ public class TestControl implements TestWatcher {
 
     @Override
     public void testFailed(ExtensionContext context, Throwable cause) {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
-        LocalDateTime now = LocalDateTime.now();
-        String currentTime = dtf.format(now);
+        String currentTime = WebDriverSettings.getCurrentTime();
         System.out.println(currentTime);
         WebDriverSettings.takeScrnShot(WebDriverSettings.getDriver(),"target/screenshots/" + currentTime + ".png");
         if (WebDriverSettings.driver != null) {
