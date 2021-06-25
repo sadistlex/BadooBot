@@ -29,6 +29,8 @@ public class TestControl implements TestWatcher {
     public void testFailed(ExtensionContext context, Throwable cause) {
         String currentTime = WebDriverSettings.getCurrentTime();
         System.out.println(currentTime);
+        System.out.println("Failed");
+        System.err.println(cause.getMessage());
         WebDriverSettings.takeScrnShot(WebDriverSettings.getDriver(),"target/screenshots/" + currentTime + ".png");
         if (WebDriverSettings.driver != null) {
             WebDriverSettings.driver.quit();
