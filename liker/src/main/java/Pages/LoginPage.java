@@ -46,13 +46,13 @@ public class LoginPage extends DriverGetter {
             wait.until(ExpectedConditions.textToBePresentInElementValue(inputEmail, WebDriverSettings.login));
             inputPassword.sendKeys(Keys.ENTER);
             wait.until(ExpectedConditions.not(ExpectedConditions.urlContains("signin")));
+            PropertyManager.setCookieProperty(getSessionCookie());
         }
         if (!driver.getCurrentUrl().contains("encounters")){
             pageInner.open("/encounters");
             wait.until(ExpectedConditions.urlContains("encounters"));
             pageInner.waitForPageLoad();
         }
-        PropertyManager.setProperty("cookie", getSessionCookie());
     }
 
     public void addCookie(){
