@@ -35,4 +35,33 @@ public class PropertyManager {
             System.err.println("ОШИБКА: Файл свойств отсуствует!");
         }
     }
+
+    public static void setCookieProperty(String value){
+        FileReader fileReader;
+        Properties property = new Properties();
+        try {
+            fileReader = new FileReader("cookie.properties");
+            property.load(fileReader);
+            fileReader.close();
+            property.setProperty("cookie", value);
+            property.store(new FileWriter("cookie.properties"), null);
+        } catch (IOException e) {
+            System.err.println("ОШИБКА: Файл свойств отсуствует!");
+        }
+    }
+
+    public static String getCookieProperty(){
+        FileReader fileReader;
+        Properties property = new Properties();
+        String result = "";
+        try {
+            fileReader = new FileReader("cookie.properties");
+            property.load(fileReader);
+            fileReader.close();
+        } catch (IOException e) {
+            System.err.println("ОШИБКА: Файл свойств отсуствует!");
+        }
+        result = property.getProperty("cookie");
+        return result;
+    }
 }

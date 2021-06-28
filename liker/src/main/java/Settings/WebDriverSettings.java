@@ -40,7 +40,7 @@ public  class WebDriverSettings {
         //WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.setPageLoadStrategy(PageLoadStrategy.EAGER);
-        options.setHeadless(true);
+        //options.setHeadless(true);
 
         LoggingPreferences logPrefs = new LoggingPreferences();
         logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
@@ -116,7 +116,7 @@ public  class WebDriverSettings {
     public static String pass = PropertyManager.getProperty("pass");;
 
     public static String getCookie() {
-        return PropertyManager.getProperty("cookie");
+        return PropertyManager.getCookieProperty();
     }
 
     public static int minWaitTime = Integer.parseInt(PropertyManager.getProperty("minWait"));
