@@ -40,7 +40,7 @@ public  class WebDriverSettings {
         //WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.setPageLoadStrategy(PageLoadStrategy.EAGER);
-        //options.setHeadless(true);
+        options.setHeadless(true);
 
         LoggingPreferences logPrefs = new LoggingPreferences();
         logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
