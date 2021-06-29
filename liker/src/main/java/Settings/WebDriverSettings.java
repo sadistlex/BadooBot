@@ -40,8 +40,9 @@ public  class WebDriverSettings {
         //WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.setPageLoadStrategy(PageLoadStrategy.EAGER);
-        options.setHeadless(true);
-
+        if (!debug.contains("true")) {
+            options.setHeadless(true);
+        }
         LoggingPreferences logPrefs = new LoggingPreferences();
         logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
         logPrefs.enable(LogType.BROWSER, Level.ALL);
@@ -128,4 +129,5 @@ public  class WebDriverSettings {
     public static String msg2 = PropertyManager.getProperty("msg2");
     public static String msg3 = PropertyManager.getProperty("msg3");
 
+    public static String debug = PropertyManager.getProperty("debug");
 }

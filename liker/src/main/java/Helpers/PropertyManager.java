@@ -18,7 +18,7 @@ public class PropertyManager {
         } catch (IOException e) {
             System.err.println("ОШИБКА: Файл свойств отсуствует!");
         }
-        result = property.getProperty(key);
+        result = property.getProperty(key, "false");
         return result;
     }
 
