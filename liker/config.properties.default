@@ -8,3 +8,5 @@ maxWait=3000
 login=
 minWait=1000
 debug=false
+attract_filter=true
+attract_threshold=7.0

@@ -130,4 +130,15 @@ public  class WebDriverSettings {
     public static String msg3 = PropertyManager.getProperty("msg3");
 
     public static String debug = PropertyManager.getProperty("debug");
+    public static String attract_filter = PropertyManager.getProperty("attract_filter");
+
+    public static float getAttract_threshold() {
+        String propertyValue = PropertyManager.getProperty("attract_threshold");
+        if (!propertyValue.contains("false")){
+            return Float.parseFloat(propertyValue);
+        }
+        else{
+            return 0;
+        }
+    }
 }
