@@ -4,7 +4,6 @@ services:
   liker:
     image: markhobson/maven-chrome:jdk-11
     container_name: liker-auto
-    shm_size: '2gb'
     command: mvn -f liker/pom.xml --no-snapshot-updates test
     volumes:
      - ./liker:/liker
