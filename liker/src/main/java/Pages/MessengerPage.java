@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import static Settings.WebDriverSettings.*;
 
 public class MessengerPage extends DriverGetter {
+
     public MessengerPage(WebDriver driver) {
         this.driver = driver;
         wait = WebDriverSettings.getWait();
@@ -68,13 +69,6 @@ public class MessengerPage extends DriverGetter {
     //Входящие сообщения
     public String incomingMessageLoc = "div[class*='message--in']";
 
-    private List<WebElement> getContactsList(){
-        System.out.println("Getting contacts list");
-        List<WebElement> contactsList = driver.findElements(By.cssSelector(contactsUsersLoc));
-        System.out.println("Found " + contactsList.size());
-        return contactsList;
-    }
-
     public void messagingSequence(){
         System.out.println("Starting messaging sequence");
         pageInner.open(messagesLink);
@@ -85,18 +79,18 @@ public class MessengerPage extends DriverGetter {
 
     private void contactIteration(){
         try {
-            loadAllContacts();
+            loadAllContacts(); //Изначально подгружены не все контакты, пробегаемся по ним, чтобы загрузились все
             List<WebElement> contactsList = getContactsList();
             for (WebElement e : contactsList) {
-                performSkips();
+                performSkips(); //Закрываем попапы
                 //Забираем имя и ссылку на аватарку сбоку, для последующей сверки с текущей выбранной.
                 String name = e.findElement(By.cssSelector(contactNameLoc)).getText();
                 String avatarLink = extractIDFromImageLink(e.findElement(By.tagName(contactImageLoc)).getAttribute("src"));
                 System.out.println("Opening conversation with " + name + " ID " + avatarLink);
-                if (!checkIfFavourite(e) || checkLastContactMsgIsOurs(e)){
+                if (!checkIfFavourite(e) || !checkLastContactMsgIsOurs(e)){ //Пропускаем контакт, если он в избранных или последнее сообщение от нас
                     pageInner.click(e);
                     waitForContactLoad(e);
-                    if (findPhoneNumberInMsgs(getIncomingMessagesList())){
+                    if (findPhoneNumberInMsgs(getMessagesList(incomingMessageLoc))){
                         pageInner.click(e.findElement(By.cssSelector(favouriteContactBtnLoc)));
                     }
                     if (isAwaitingResponse()) {
@@ -114,6 +108,51 @@ public class MessengerPage extends DriverGetter {
             System.out.println("Stale element exception caught, reloading contacts");
             contactIteration();
         }
+    }
+
+    private void messageSendLogic(){
+        Stages currentStage = checkCurrentStage();
+        if (currentStage.equals(Stages.OTHER)){
+            System.out.println("Skipping contact, foreign messages found");
+        }
+        else if (currentStage.equals(Stages.DONE)){
+            System.out.println("Skipping contact, all steps are already finished");
+        }
+        else {
+            String message;
+            int msgAmount;
+            switch (currentStage){
+                case ONE:
+                    message = msg1;
+                    msgAmount = 0;
+                    break;
+                case TWO:
+                    message = msg2;
+                    msgAmount = 1;
+                    break;
+                case THREE:
+                    message = msg3;
+                    msgAmount = 2;
+                    break;
+                default:
+                    message = "";
+                    msgAmount = 0;
+            }
+            System.out.println("Sending message: " + message);
+            inputMessage.sendKeys(message);
+            wait.until(ExpectedConditions.textToBePresentInElement(inputMessage, message));
+            pageInner.click(sendMessageBtn);
+            System.out.println("Message sent");
+            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector(outgoingMessageLoc), msgAmount));
+            System.out.println("Message visible");
+        }
+    }
+
+    private List<WebElement> getContactsList(){
+        System.out.println("Getting contacts list");
+        List<WebElement> contactsList = driver.findElements(By.cssSelector(contactsUsersLoc));
+        System.out.println("Found " + contactsList.size());
+        return contactsList;
     }
 
     private void waitForContactLoad(WebElement contact){
@@ -155,45 +194,6 @@ public class MessengerPage extends DriverGetter {
         }
     }
 
-    private void messageSendLogic(){
-        Stages currentStage = checkCurrentStage();
-        if (currentStage.equals(Stages.OTHER)){
-            System.out.println("Skipping contact, foreign messages found");
-        }
-        else if (currentStage.equals(Stages.DONE)){
-            System.out.println("Skipping contact, all steps are already finished");
-        }
-        else {
-            String message;
-            int msgAmount;
-            switch (currentStage){
-                case ONE:
-                    message = msg1;
-                    msgAmount = 0;
-                    break;
-                case TWO:
-                    message = msg2;
-                    msgAmount = 1;
-                    break;
-                case THREE:
-                    message = msg3;
-                    msgAmount = 2;
-                    break;
-                default:
-                    message = "";
-                    msgAmount = 0;
-            }
-            System.out.println("Sending message: " + message);
-            inputMessage.sendKeys(message);
-            wait.until(ExpectedConditions.textToBePresentInElement(inputMessage, message));
-            pageInner.click(sendMessageBtn);
-            System.out.println("Message sent");
-            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector(outgoingMessageLoc), msgAmount));
-            System.out.println("Message visible");
-        }
-
-    }
-
     private boolean isAwaitingResponse(){
         System.out.println("Checking if contact is awaiting response");
         List<WebElement> messagelist = driver.findElements(By.cssSelector(messageLoc));
@@ -215,38 +215,18 @@ public class MessengerPage extends DriverGetter {
         }
     }
 
-    private List<String> getOutgoingMessagesList(){
-        System.out.println("Getting outgoing messages");
-        List<WebElement> outMessagesElementsList = driver.findElements(By.cssSelector(outgoingMessageLoc));
-        System.out.println("Amount of outgoing message elements " + outMessagesElementsList.size());
+    private List<String> getMessagesList(String locator){
+        System.out.println("Getting messages by locator " + locator);
+        List<WebElement> messagesElementsList = driver.findElements(By.cssSelector(locator));
+        System.out.println("Amount of message elements " + messagesElementsList.size());
         List<String> messageTexts = new ArrayList<>();
-        for (WebElement e : outMessagesElementsList){
+        for (WebElement e : messagesElementsList){
             String messageText = e.findElement(By.tagName("span")).getText();
             System.out.println(messageText);
             messageTexts.add(messageText);
         }
-        System.out.println("Amount of outgoing message texts " + messageTexts.size());
+        System.out.println("Amount of message texts " + messageTexts.size());
         return messageTexts;
-    }
-
-    private List<String> getIncomingMessagesList(){
-        System.out.println("Getting incoming messages");
-        List<WebElement> inMessagesElementsList = driver.findElements(By.cssSelector(incomingMessageLoc));
-        System.out.println("Amount of incoming message elements " + inMessagesElementsList.size());
-        List<String> messageTexts = new ArrayList<>();
-        for (WebElement e : inMessagesElementsList){
-            String messageText = e.findElement(By.tagName("span")).getText();
-            System.out.println(messageText);
-            messageTexts.add(messageText);
-        }
-        System.out.println("Amount of outgoing message texts " + messageTexts.size());
-        return messageTexts;
-    }
-
-    private String getLastMessageText(){
-        System.out.println("Getting latest outgoing message");
-        List<String> messagesList = getOutgoingMessagesList();
-        return messagesList.get(messagesList.size()-1);
     }
 
     private String msgWithoutSmileys(String msg){
@@ -256,8 +236,8 @@ public class MessengerPage extends DriverGetter {
                 .trim();
     }
 
-
     private boolean checkIfHasForeignMsgs(List<String> messageList){
+        //Проверяю на наличие посторонних сообщений, чтобы не писать в ручные переписки.
         System.out.println("Checking for foreign messages");
         List<String> presetMessagesList = List.of(msgWithoutSmileys(msg1), msgWithoutSmileys(msg2), msgWithoutSmileys(msg3));
 //        System.out.println("List of preset messages:");
@@ -280,7 +260,7 @@ public class MessengerPage extends DriverGetter {
     }
 
     private Stages checkCurrentStage(){
-        List<String> messageTexts = getOutgoingMessagesList();
+        List<String> messageTexts = getMessagesList(outgoingMessageLoc);
         if (messageTexts.size()==0){
             return Stages.ONE;
         }
@@ -299,6 +279,7 @@ public class MessengerPage extends DriverGetter {
     }
 
     private String extractIDFromImageLink(String link){
+        //Ссылки на аватарки в списке контактов и в открытой беседе разные, но у них есть один общий атрибут, который мы достаем, чтобы понять что картинки одинаковые.
         Pattern pattern = Pattern.compile("(h=.*?)&");
         Matcher matcher = pattern.matcher(link);
         String result = "";
@@ -326,11 +307,13 @@ public class MessengerPage extends DriverGetter {
     }
 
     private void loadAllContacts(){
+        //Изначально подгружены не все контакты, нужно пройтись по ним, чтобы подгрузить все.
         System.out.println("Loading all contacts");
         int afterCount = 1;
         int beforeCount = 0;
-        List<WebElement> contactsList = new ArrayList<>();
+        List<WebElement> contactsList;
         while (afterCount>beforeCount){
+            //Кликаем на самый нижний доступный контакт, пока их количество не перестанет увеличиваться.
             contactsList = getContactsList();
             beforeCount = contactsList.size();
             WebElement lastContact = contactsList.get(contactsList.size()-1);

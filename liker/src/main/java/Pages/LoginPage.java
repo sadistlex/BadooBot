@@ -28,13 +28,19 @@ public class LoginPage extends DriverGetter {
     @FindBy (css = "button[type='submit']")
     public WebElement loginBtn;
 
-    public void login(){
+    public void loginSequence(){
+        pageInner.open(signinLink);
+        login();
+        pageInner.waitForPageLoad();
+    }
+
+    private void login(){
         addCookie();
         pageInner.waitForPageLoad();
         System.out.println("Refreshing page");
-        WebDriverSettings.getDriver().navigate().refresh();
+        WebDriverSettings.getDriver().navigate().refresh(); //Обновляем страницу, чтобы попробовать зайти через куку
         pageInner.waitForPageLoad();
-        if (driver.getCurrentUrl().contains("signin")){
+        if (driver.getCurrentUrl().contains("signin")){ //Если мы все еще на странице логина, значит кука не подошла, заходим по логин/пароль
             System.out.println("Timeout caught, logging in the usual way");
             clearCookie();
             pageInner.waitForPageLoad();
@@ -46,34 +52,28 @@ public class LoginPage extends DriverGetter {
             wait.until(ExpectedConditions.textToBePresentInElementValue(inputEmail, WebDriverSettings.login));
             inputPassword.sendKeys(Keys.ENTER);
             wait.until(ExpectedConditions.not(ExpectedConditions.urlContains("signin")));
-            PropertyManager.setCookieProperty(getSessionCookie());
+            PropertyManager.setCookieProperty(getSessionCookie()); //Сохраняем новую рабочую куку в проперти
         }
-        if (!driver.getCurrentUrl().contains("encounters")){
+        if (!driver.getCurrentUrl().contains("encounters")){ //Иногда бывает, что после логина нас направляет на промо страницу вместо encounters
             pageInner.open("/encounters");
             wait.until(ExpectedConditions.urlContains("encounters"));
             pageInner.waitForPageLoad();
         }
     }
 
-    public void addCookie(){
+    private void addCookie(){
         System.out.println("Adding cookie");
         Cookie cookie = new Cookie("session", WebDriverSettings.getCookie());
         driver.manage().addCookie(cookie);
     }
 
-    public void clearCookie(){
+    private void clearCookie(){
         System.out.println("Clearing session cookie");
         driver.manage().deleteCookieNamed("session");
     }
 
-    public String getSessionCookie(){
+    private String getSessionCookie(){
         return driver.manage().getCookieNamed("session").getValue();
-    }
-
-    public void loginSequence(){
-        pageInner.open(signinLink);
-        login();
-        pageInner.waitForPageLoad();
     }
 
 }

@@ -24,8 +24,6 @@ public class Page extends DriverGetter {
         PageFactory.initElements(driver,this);
     }
 
-    public int switchToMobileWidth = 1024;
-
     //Кнопка продолжить при двойном логине
     @FindBy (css = "div[class='btn js-continue']")
     public WebElement continueBtn;
@@ -64,14 +62,14 @@ public class Page extends DriverGetter {
         String loc = getLocatorFromWebElement(element);
         boolean exists = driver.findElements(By.cssSelector(loc)).size() != 0;
         driver.manage().timeouts().implicitlyWait(WebDriverSettings.getWaitTime(), TimeUnit.SECONDS);
-        if(exists) {
+        if (exists) {
             wait.until(ExpectedConditions.invisibilityOf(element));
             Assertions.assertFalse(element.isDisplayed(),"Невиден ли элемент");
         }
-
     }
 
     public String getLocatorFromWebElement(WebElement element) {
+        //Поддерживает только css селектор
         String elementStr = element.toString();
         int index = elementStr.lastIndexOf("elector: ");
         String result = elementStr.substring(index+9);
@@ -89,7 +87,6 @@ public class Page extends DriverGetter {
             System.out.println("Caught TimeoutException, waiting for Jquery to be done");
             waitForJQueryToBeInactive();
             waitForPageLoad();
-            //WebDriverSettings.printPerformanceLog();
         }
         URL pageUrl = null;
         try {
@@ -99,46 +96,6 @@ public class Page extends DriverGetter {
         }
         if (pageUrl != null) {
             Assertions.assertEquals(url, pageUrl.getFile());
-        }
-    }
-
-    public void assertPageURLContains(String url){
-        System.out.println("Asserting page URL contains");
-        try {
-            wait.until(ExpectedConditions.urlContains(url));
-        }
-        catch(TimeoutException e){
-            System.out.println("Caught TimeoutException, waiting for Jquery to be done");
-            waitForJQueryToBeInactive();
-            waitForPageLoad();
-            //WebDriverSettings.printPerformanceLog();
-        }
-        URL pageUrl = null;
-        try {
-            pageUrl = new URL(driver.getCurrentUrl());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        if (pageUrl != null) {
-            Assertions.assertTrue(pageUrl.getFile().contains(url),"Проверяю наличие строки в url");
-        }
-
-    }
-
-    public void assertPageURL(String url, boolean fullLink) {
-        if (fullLink) {
-            try {
-                wait.until(ExpectedConditions.urlContains(url));
-            }
-            catch(TimeoutException e){
-                System.out.println("Caught TimeoutException, waiting for Jquery to be done");
-                waitForJQueryToBeInactive();
-                waitForPageLoad();
-            }
-            Assertions.assertEquals(url, driver.getCurrentUrl());
-        }
-        else{
-            assertPageURL(url);
         }
     }
 
@@ -162,18 +119,10 @@ public class Page extends DriverGetter {
         open(new Dimension(1920,1080));
     }
 
-    public void openNginx(String url){
-        System.out.println("Opening " + url);
-        driver.manage().window().setSize(new Dimension(1920,1080));
-        driver.get(url);
-    }
-
     public void navigate(String urlAppend){
         System.out.println("Navigating to " + urlAppend);
         driver.navigate().to(WebDriverSettings.getMainUrl() + urlAppend);
     }
-
-
 
     public void scrollToTop(){
         System.out.println("Scrolling to top of the page");
@@ -214,32 +163,6 @@ public class Page extends DriverGetter {
             element.click();
         }
 
-    }
-
-    public void assertInputIsRed(WebElement element, boolean exists){
-        WebElement parent = (WebElement) ((JavascriptExecutor) driver)
-                .executeScript("return arguments[0].parentNode;", element);
-
-        if (exists){
-            Assertions.assertTrue(parent.getAttribute("class").contains("is-error"),"Проверяем, что ошибка видна");
-        }
-        else {
-            Assertions.assertFalse(parent.getAttribute("class").contains("is-error"),"Проверяем, что ошибка не видна");
-        }
-    }
-    public void assertInputIsRed(WebElement element, boolean exists, boolean checkText){
-        WebElement parent = (WebElement) ((JavascriptExecutor) driver)
-                .executeScript("return arguments[0].parentNode;", element);
-
-        if (exists){
-            Assertions.assertTrue(parent.getAttribute("class").contains("is-error"),"Проверяем, что ошибка видна");
-            if (checkText) {
-                Assertions.assertEquals("Это поле необходимо заполнить.", parent.findElement(By.cssSelector("label[class='error']")).getText());
-            }
-        }
-        else {
-            Assertions.assertFalse(parent.getAttribute("class").contains("is-error"),"Проверяем, что ошибка не видна");
-        }
     }
 
     public void waitForJQueryToBeInactive() {
@@ -342,7 +265,6 @@ public class Page extends DriverGetter {
         driver.manage().timeouts().implicitlyWait(1, TimeUnit.MILLISECONDS);
         String locator = getLocatorFromWebElement(element);
         List<WebElement> list= driver.findElements(By.cssSelector(locator));
-
         if (list.size() != 0) {
             Actions actions = new Actions(driver);
             System.out.println("Moving to element");
@@ -351,35 +273,5 @@ public class Page extends DriverGetter {
         }
         driver.manage().timeouts().implicitlyWait(WebDriverSettings.getWaitTime(), TimeUnit.SECONDS);
     }
-
-    public void scrollAndClick(WebElement element){
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.MILLISECONDS);
-        String locator = getLocatorFromWebElement(element);
-        List<WebElement> list = driver.findElements(By.cssSelector(locator));
-
-        if (list.size() != 0) {
-            Actions actions = new Actions(driver);
-            System.out.println("Moving to element");
-            actions.moveToElement(element);
-            actions.perform();
-            System.out.println("Clicking on element");
-            click(element);
-        }
-        driver.manage().timeouts().implicitlyWait(WebDriverSettings.getWaitTime(), TimeUnit.SECONDS);
-    }
-
-
-    public void checkErrorMsg(WebElement element, boolean exists){
-        if (exists) {
-            waitForElementVisible(element);
-            Assertions.assertTrue(element.isDisplayed());
-            //Assertions.assertEquals("Это поле необходимо заполнить.", element.getText());
-        }
-        else {
-            wait.until(ExpectedConditions.invisibilityOf(element));
-            Assertions.assertFalse(element.isDisplayed());
-        }
-    }
-
 
 }

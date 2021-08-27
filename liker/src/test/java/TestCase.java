@@ -8,8 +8,6 @@ import org.openqa.selenium.support.PageFactory;
 
 @ExtendWith(TestControl.class)
 class TestCase extends WebDriverSettings {
-    static MainPage mainPage;
-    static Actions actions;
     static Page page;
     static LoginPage loginPage;
     static EncountersPage encountersPage;
@@ -18,18 +16,15 @@ class TestCase extends WebDriverSettings {
 
     @Nested
     @Tag("Main")
-    //@Disabled
     public class MainCases {
 
         @BeforeEach
         public void init() {
             WebDriverSettings.setup();
-            mainPage = new MainPage(driver);
             loginPage = new LoginPage(driver);
             encountersPage = new EncountersPage(driver);
             messengerPage = new MessengerPage(driver);
             page = PageFactory.initElements(driver, Page.class);
-
         }
 
         @Test

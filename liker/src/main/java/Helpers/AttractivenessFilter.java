@@ -11,7 +11,7 @@ public class AttractivenessFilter {
 
     public static String sendImgForRating(byte[] image){
         System.out.println("Sending POST request with image");
-        Response response =  given()
+        Response response = given()
                 .body(image)
                 .post("https://api.haystack.ai/api/image/analyze?apikey=bcc555e7f0a8f53f04f3f2abeae71611&output=json&model=attractiveness")
                 .then()
@@ -31,6 +31,5 @@ public class AttractivenessFilter {
         System.out.println(attractiveness);
         return attractiveness;
     }
-
 
 }

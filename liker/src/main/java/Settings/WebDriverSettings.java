@@ -36,8 +36,8 @@ public  class WebDriverSettings {
 
 
     public static void setup(){
-        WebDriverManager.chromedriver().driverVersion("90.0.4430.24").setup();
-        //WebDriverManager.chromedriver().setup();
+        //WebDriverManager.chromedriver().driverVersion("90.0.4430.24").setup();
+        WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.setPageLoadStrategy(PageLoadStrategy.EAGER);
         if (!debug.contains("true")) {
@@ -48,7 +48,6 @@ public  class WebDriverSettings {
         logPrefs.enable(LogType.BROWSER, Level.ALL);
         options.setCapability("goog:loggingPrefs", logPrefs);
 
-        //options.addArguments("start-maximized");
         options.addArguments("enable-automation");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
@@ -101,7 +100,7 @@ public  class WebDriverSettings {
 
     private static int waitTime = 10;
 
-    public static  int getWaitTime() {
+    public static int getWaitTime() {
         return waitTime;
     }
 
