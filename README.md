@@ -1,6 +1,6 @@
 <h2>Бот для сайта знакомств Badoo</h2>
 
-Перед запуском скопируйте файлы config.properties.default и cookie.properties.default в папке liker и уберите .default из названия и выставьте настройки.
+Перед запуском скопируйте файлы config.properties.default и cookie.properties.default в папке liker, уберите .default из названия и выставьте настройки.
 
 <h4>Алгоритм работы:</h4>
 
