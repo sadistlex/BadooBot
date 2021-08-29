@@ -11,10 +11,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import static Settings.WebDriverSettings.signinLink;
 
 public class LoginPage extends DriverGetter {
-    public LoginPage(WebDriver driver) {
-        this.driver = driver;
+    public LoginPage() {
+        this.driver = WebDriverSettings.getDriver();
         wait = WebDriverSettings.getWait();
-        PageFactory.initElements(driver,this);
+        PageFactory.initElements(WebDriverSettings.getDriver(),this);
     }
 
     //Логин

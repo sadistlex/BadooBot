@@ -8,5 +8,5 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class DriverGetter {
     public static WebDriver driver = WebDriverSettings.getDriver();
     public static WebDriverWait wait = WebDriverSettings.getWait();
-    public static Page pageInner = new Page(driver);
+    public static Page pageInner = new Page();
 }

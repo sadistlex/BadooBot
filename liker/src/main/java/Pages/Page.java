@@ -18,10 +18,10 @@ import java.util.concurrent.TimeUnit;
 
 public class Page extends DriverGetter {
 
-    public Page(WebDriver driver) {
-        this.driver = driver;
+    public Page() {
+        this.driver = WebDriverSettings.getDriver();
         wait = WebDriverSettings.getWait();
-        PageFactory.initElements(driver,this);
+        PageFactory.initElements(WebDriverSettings.getDriver(),this);
     }
 
     //Кнопка продолжить при двойном логине

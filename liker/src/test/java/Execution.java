@@ -7,7 +7,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.PageFactory;
 
 @ExtendWith(TestControl.class)
-class TestCase extends WebDriverSettings {
+class Execution extends WebDriverSettings {
     static Page page;
     static LoginPage loginPage;
     static EncountersPage encountersPage;
@@ -16,15 +16,15 @@ class TestCase extends WebDriverSettings {
 
     @Nested
     @Tag("Main")
-    public class MainCases {
+    public class MainSequence {
 
         @BeforeEach
         public void init() {
             WebDriverSettings.setup();
-            loginPage = new LoginPage(driver);
-            encountersPage = new EncountersPage(driver);
-            messengerPage = new MessengerPage(driver);
-            page = PageFactory.initElements(driver, Page.class);
+            loginPage = new LoginPage();
+            encountersPage = new EncountersPage();
+            messengerPage = new MessengerPage();
+            page = new Page();
         }
 
         @Test

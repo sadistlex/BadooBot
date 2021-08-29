@@ -18,10 +18,10 @@ import static Settings.WebDriverSettings.*;
 
 public class MessengerPage extends DriverGetter {
 
-    public MessengerPage(WebDriver driver) {
-        this.driver = driver;
+    public MessengerPage() {
+        this.driver = WebDriverSettings.getDriver();
         wait = WebDriverSettings.getWait();
-        PageFactory.initElements(driver,this);
+        PageFactory.initElements(WebDriverSettings.getDriver(),this);
     }
 
     public enum Stages {

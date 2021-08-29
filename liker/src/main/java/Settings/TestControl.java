@@ -8,8 +8,8 @@ import java.util.Optional;
 public class TestControl implements TestWatcher {
     @Override
     public void testSuccessful(ExtensionContext context) {
-        if (WebDriverSettings.driver != null) {
-            WebDriverSettings.driver.quit();
+        if (WebDriverSettings.getDriver() != null) {
+            WebDriverSettings.getDriver().quit();
         }
     }
 
@@ -20,8 +20,8 @@ public class TestControl implements TestWatcher {
 
     @Override
     public void testAborted(ExtensionContext context, Throwable cause) {
-        if (WebDriverSettings.driver != null) {
-            WebDriverSettings.driver.quit();
+        if (WebDriverSettings.getDriver() != null) {
+            WebDriverSettings.getDriver().quit();
         }
     }
 
@@ -32,8 +32,8 @@ public class TestControl implements TestWatcher {
         System.out.println("Failed");
         System.err.println(cause.getMessage());
         WebDriverSettings.takeScrnShot(WebDriverSettings.getDriver(),"target/screenshots/" + currentTime + ".png");
-        if (WebDriverSettings.driver != null) {
-            WebDriverSettings.driver.quit();
+        if (WebDriverSettings.getDriver() != null) {
+            WebDriverSettings.getDriver().quit();
         }
     }
 

@@ -20,10 +20,10 @@ import static Settings.WebDriverSettings.*;
 
 public class EncountersPage extends DriverGetter {
 
-    public EncountersPage(WebDriver driver) {
-        this.driver = driver;
+    public EncountersPage() {
+        this.driver = WebDriverSettings.getDriver();
         wait = WebDriverSettings.getWait();
-        PageFactory.initElements(driver,this);
+        PageFactory.initElements(WebDriverSettings.getDriver(),this);
     }
 
     //Сообщение для попапа при совпадении

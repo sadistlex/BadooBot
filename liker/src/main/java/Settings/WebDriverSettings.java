@@ -23,8 +23,8 @@ import java.util.logging.Level;
 
 public  class WebDriverSettings {
 
-    public static WebDriver driver;
-    public static WebDriverWait wait;
+    private static WebDriver driver;
+    private static WebDriverWait wait;
 
     public static WebDriver getDriver() {
         return driver;
